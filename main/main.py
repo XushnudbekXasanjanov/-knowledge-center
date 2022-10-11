@@ -35,9 +35,10 @@ class PaymentStudent(APIView):
             course = request.POST.get('course')
             summa = request.POST.get('summa')
             kod = request.POST.get('kod')
+            yonalish = Directions.objects.get(course=int(course))
             for i in User.objects.filter(types=3):
                 if i.kod == int(kod):
-                     if int(summa) == Directions.monthly_payment:
+                     if int(summa) == yonalish.monthly_payment:
                              query = Payment.objects.create(is_paid=True, summa=float(summa), course_id=course,date=datetime.datetime.now())
                              ser = PaymentSerializer(query)
                              data = {
@@ -45,8 +46,8 @@ class PaymentStudent(APIView):
                                 }
                              return Response(data)
 
-                     elif int(summa) < Directions.monthly_payment:
-                         som = Directions.monthly_payment - int(summa)
+                     elif int(summa) < yonalish.monthly_payment:
+                         som = yonalish.monthly_payment - int(summa)
                          query = Payment.objects.create(is_paid=False, summa=float(summa), course_id=course, date=datetime.datetime.now())
                          ser = PaymentSerializer(query)
 

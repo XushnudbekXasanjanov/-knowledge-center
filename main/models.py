@@ -23,7 +23,7 @@ class User(AbstractUser):
 class Directions(models.Model):
     name = models.CharField(max_length=255)
     duration = models.IntegerField()
-    monthly_payment = models.FloatField()
+    monthly_payment = models.IntegerField()
     hour = models.FloatField()
     max_pupil = models.IntegerField()
 
