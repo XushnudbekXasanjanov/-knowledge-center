@@ -36,9 +36,9 @@ class PaymentStudent(APIView):
             summa = request.POST.get('summa')
             kod = request.POST.get('kod')
             yonalish = Directions.objects.get(course=int(course))
-            for i in User.objects.filter(types=3):
-                if i.kod == int(kod):
-                     if int(summa) == yonalish.monthly_payment:
+            # for i in User.objects.filter(types=3):
+            if User.objects.filter(kod=int(kod)):
+               if int(summa) >= yonalish.monthly_payment:
                              query = Payment.objects.create(is_paid=True, summa=float(summa), course_id=course,date=datetime.datetime.now())
                              ser = PaymentSerializer(query)
                              data = {
@@ -46,7 +46,7 @@ class PaymentStudent(APIView):
                                 }
                              return Response(data)
 
-                     elif int(summa) < yonalish.monthly_payment:
+               elif int(summa) < yonalish.monthly_payment:
                          som = yonalish.monthly_payment - int(summa)
                          query = Payment.objects.create(is_paid=False, summa=float(summa), course_id=course, date=datetime.datetime.now())
                          ser = PaymentSerializer(query)
@@ -56,8 +56,9 @@ class PaymentStudent(APIView):
                              'toliq tolovga qancha qolganligi:' : som
                          }
                          return Response(data)
-                else:
-                        return Response('error')
+
+        else:
+                return Response('error')
 
 
 
@@ -178,7 +179,27 @@ class MonthRate(APIView):
             month = request.POST.get('month')
             student = request.POST.get('student')
             rate = request.POST.get('rate')
-            query = Rate.objects.create(month_id=month, student_id=student, rate=rate)
-            ser = RateSerializer(query)
-            return Response(ser.data)
+            if Rate.objects.filter(student_id=student,month_id=month):
+                return Response('bu oyda bu oquvchiga baxo uje berilgan')
+            else:
+                 query = Rate.objects.create(month_id=month, student_id=student, rate=rate)
+                 ser = RateSerializer(query)
+                 data = {
+                     "o'tdi":ser.data
+                 }
+                 return Response(data)
 
+class ReplyComplaints(APIView):
+    authentication_classes = [authentication.TokenAuthentication]
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self,request,pk):
+        user = request.user
+        if user.types == 1 or user.types == 4:
+            s = Complaint.objects.get(id=pk)
+            if s.is_replied == False:
+                s.is_replied = True
+                s.save()
+                return Response({'ok'})
+            # else:
+            #     return Response('uje javob qaytarilgan')

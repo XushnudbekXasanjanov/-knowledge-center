@@ -16,4 +16,5 @@ urlpatterns = [
     path('teacher-courses/',TeachersCourses.as_view()), # har bir oqituvchi ozini kurslarini koradi
     path('rate/',MonthRate.as_view()), # baholash oylik
     path('create-directions/',CreateDirections.as_view()), # yonalishlar create qilish
+    path('replys/<int:pk>/',ReplyComplaints.as_view()) # reply qilish
 ]
